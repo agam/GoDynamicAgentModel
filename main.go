@@ -16,13 +16,14 @@ import "github.com/gizak/termui/v3/widgets"
 import "gonum.org/v1/gonum/stat/distuv"
 
 var (
-	paramNumAgents      = 100
-	paramProb           = 0.05
-	paramConfidence     = 0.3
-	paramAlpha          = 0.1
-	paramNumUpdateNodes = 1
-	paramMaxSteps       = 100000
-	paramMinStationary  = 100
+	paramNumAgents                  = 100
+	paramProb                       = 0.05
+	paramConfidence                 = 0.3
+	paramAlpha                      = 0.1
+	paramNumUpdateNodes             = 1
+	paramMaxSteps                   = 6000
+	paramMinStationary              = 100
+	paramOpinionDiffEpsilon float64 = 0.00000001
 )
 
 type Agent struct {
@@ -72,7 +73,7 @@ func (m *Model) updateOpinions() {
 
 		opinionDiff := agent1.current_opinion - agent2.current_opinion
 		if glog.V(3) {
-			glog.Infof("Debug: evaling (%d, %d) who have a diff of %f\n", agentId, neighborId, opinionDiff)
+			glog.Infof("Debug: evaling (%d, %d) who have a diff of %e\n", agentId, neighborId, opinionDiff)
 		}
 
 		if math.Abs(opinionDiff) < m.confidence {
@@ -148,9 +149,10 @@ func (m *Model) initializeNetwork(n int, p float64) {
 
 func (model *Model) opinionsChanged() bool {
 	for id, agent := range model.agents {
-		if agent.previous_opinion != agent.new_opinion {
+		opinionDiff := math.Abs(agent.previous_opinion - agent.new_opinion)
+		if opinionDiff > paramOpinionDiffEpsilon {
 			if glog.V(3) {
-				glog.Infof("Debug: found an opinion diff at %d of %f\n", id, (agent.previous_opinion - agent.new_opinion))
+				glog.Infof("Debug: found an opinion diff at %d of %e\n", id, opinionDiff)
 			}
 			return false
 		}
