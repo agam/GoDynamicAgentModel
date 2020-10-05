@@ -21,3 +21,6 @@ $ go run main.go  --v=3 --log_dir=/home/agam/tmp/
 ## Conclusion
 - It works
 - It's _fast_ :-)
+
+## Sample screenshot
+[Screenshot](https://github.com/agam/GoDynamicAgentModel/edit/master/SampleScreenShot.png)
